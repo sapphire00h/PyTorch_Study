@@ -7,7 +7,7 @@ from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
 import numpy
 
-from model import *
+
 
 #准备数据集
 train_data=torchvision.datasets.CIFAR10("../dataset",train=True,transform=torchvision.transforms.ToTensor(),
@@ -25,15 +25,38 @@ test_dataloader=DataLoader(test_data,batch_size=64)
 #搭建神经网络
 
 #创建网络模型
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.model1=nn.Sequential(
+            Conv2d(3,32,5,stride=1,padding=2),
+            MaxPool2d(2),
+            Conv2d(32, 32, 5, padding=2),
+            MaxPool2d(2),
+            Conv2d(32, 64, 5, padding=2),
+            MaxPool2d(2),
+            Flatten(),
+            Linear(1024,64),
+            Linear(64,10),
+        )
+
+    def forward(self,x):
+        x=self.model1(x)
+        return x
+
 
 model=Model()
+if torch.cuda.is_available():
+    model=model.cuda()
 #损失函数
 loss_fn=nn.CrossEntropyLoss()
-
+if torch.cuda.is_available():
+    loss_fn=loss_fn.cuda()
 #定义优化器
 learning_rate=0.001
 #1e-2=1*10^(-2)=1/100=0.01
 optimizer=torch.optim.SGD(model.parameters(),lr=learning_rate)
+
 #设置训练网络参数
 
 #记录训练次数
@@ -53,6 +76,9 @@ for i in range(epoch):
     #训练步骤开始
     for data in train_dataloader:
         imgs,targets=data
+        if torch.cuda.is_available():
+            imgs=imgs.cuda()
+            targets=targets.cuda()
         outputs=model(imgs)
         #计算loss
         loss=loss_fn(outputs,targets)
@@ -75,6 +101,9 @@ for i in range(epoch):
     with torch.no_grad():
         for data in test_dataloader:
             imgs,targets=data
+            if torch.cuda.is_available():
+                imgs = imgs.cuda()
+                targets = targets.cuda()
             outputs=model(imgs)
             loss=loss_fn(outputs,targets)
             #loss是tensor数据类型，加上item()
@@ -90,7 +119,7 @@ for i in range(epoch):
         total_test_step=total_test_step+1
 
         #保存训练模型
-        if total_train_step % 5 == 0:
+        if total_train_step%5==0:
             torch.save(model,"model_{}.pth".format(total_test_step))
             #torch.save(model.state_dict(), "model_{}.pth".format(total_test_step))
             print("第{}轮训练的模型已保存".format(total_test_step))
