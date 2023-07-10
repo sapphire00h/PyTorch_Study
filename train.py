@@ -1,9 +1,8 @@
 import torch
 import torchvision
 from tensorboardX import SummaryWriter
-from theano.tensor import Flatten
 from torch import nn
-from torch.nn import Linear, Conv2d, MaxPool2d
+from torch.nn import Linear, Conv2d, MaxPool2d,Flatten
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
 import numpy

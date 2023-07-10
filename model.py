@@ -1,9 +1,8 @@
 import torch
 import torchvision
 from tensorboardX import SummaryWriter
-from theano.tensor import Flatten
 from torch import nn
-from torch.nn import Linear, Conv2d, MaxPool2d
+from torch.nn import Linear, Conv2d, MaxPool2d,Flatten
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
 import numpy
@@ -19,7 +18,7 @@ class Model(nn.Module):
             MaxPool2d(2),
             Conv2d(32, 64, 5, padding=2),
             MaxPool2d(2),
-            nn.Flatten(),
+            Flatten(),
             Linear(1024,64),
             Linear(64,10),
         )
